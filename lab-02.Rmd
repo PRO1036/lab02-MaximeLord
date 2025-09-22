@@ -19,7 +19,7 @@ Commençons par filtrer les données pour retirer le point représenté par Trin
 
 ```{r filter-data, message=FALSE}
 plastic_waste <- plastic_waste %>%
-  filter(plastic_waste_per_cap < 3.5)
+  filter(plastic_waste_per_cap < 3)
 ```
 
 
@@ -30,17 +30,25 @@ plastic_waste <- plastic_waste %>%
 ```{r plastic-waste-continent}
 ggplot(plastic_waste, aes(plastic_waste_per_cap)) +
   geom_histogram(binwidth = 0.05) +
-  facet_wrap(~continent, ncol = 3)
+  facet_wrap(~continent, ncol = 3) +
+  labs(title = "Distribution des pays selon la quantitée de déchets plastiques par habitant",
+       x = "Quantité de déchets plastiques par habitants",
+       y = "Nombre de pays")
   
 ```
 
-Avec l'aide de cette représentation on voit facilement que l'Afrique et l'Asie on moins de déchets de plastique par habitant que l'Europe et l'Amérique du Nord alors que l'Océanie et l'Amérique du Sud se situent à quelque part au milieu.
+Avec l'aide de cette représentation on voit facilement que l'Afrique et l'Asie ont moins de déchets de plastique par habitant que l'Europe et l'Amérique du Nord alors que l'Océanie et l'Amérique du Sud se situent à quelque part au milieu.
 
 ### Exercise 2
 
 ```{r plastic-waste-density}
-ggplot(plastic_waste, aes(plastic_waste_per_cap,color = continent, fill = continent)) + 
-  geom_density(alpha = 0.3)
+ggplot(plastic_waste, aes(plastic_waste_per_cap, fill = continent)) + 
+  geom_density(alpha = 0.3) +
+  labs(x = "Quantité de déchets plastiques par habitants",
+       y = "Densité",
+       title = "Densité de pays produisant une certaine quantitée de déchets plastiques",
+       subtitle = "Pour chaque continent",
+       fill = "Continent")
 ```
 
 La couleur, soit par la fonction ``color``, ou par la fonction ``fill``, est une variable. Celle-ci va varier en fonction du continent qu'elle représente. C'est pourquoi qu'elle doit se retrouver dans l'environnement ``aes``, là où on identifie les variables. Pour ce qui est du paramètre ``alpha``, il est le même pour toute les courbes et est propre à la courbe de densité. Dans un autre style de représentation, il aurait une signification complètement différente. C'est donc la raison de son identification dans l'environnement ``geom_density``.
@@ -50,43 +58,81 @@ La couleur, soit par la fonction ``color``, ou par la fonction ``fill``, est une
 Boxplot:
 
 ```{r plastic-waste-boxplot}
-# insert code here
+ggplot(plastic_waste, aes(continent, plastic_waste_per_cap))+
+  geom_boxplot() +
+  labs(x = "Continent",
+       y = "Quantité de déchets plastiques par habitants", 
+       title = "Quantité de déchets plastiques par habitants pour chaque pays en fonction du continent")
 ```
 
 Violin plot:
 
 ```{r plastic-waste-violin}
-# insert code here
+ggplot(plastic_waste, aes(continent, plastic_waste_per_cap))+
+  geom_violin() +
+  labs(x = "Continent",
+       y = "Quantité de déchets plastiques par habitants", 
+       title = "Quantité de déchets plastiques par habitants pour chaque pays en fonction du continent")
 ```
 
-Réponse à la question...
+Contrairement aux box plots, les violin plots offrent une meilleure visualisation de la distribution des données autour de la moyenne à l'aide d'une courbe de densité combinée aux mesures de tendances centrales des box plots. 
 
 ### Exercise 4
 
 
 ```{r plastic-waste-mismanaged}
-# insert code here
+ggplot(plastic_waste, aes(plastic_waste_per_cap, mismanaged_plastic_waste_per_cap, color = continent))+
+  geom_point() +
+  labs(y = "Quantitée de déchets plastiques mals 
+       gérés par habitant",
+       x = " Quantité de déchets plastiques par habitant", 
+       title ="Quantitée de déchets plastiques mals gérés par habitant en fonction de la 
+       Quantité de déchets plastiques par habitant" )
 ```
 
-Réponse à la question...
+En général, la relation est plutôt linéaire, plus il y a de déchets produits, plus il y en aura qui seront mal gérés. Pour ce qui est de la répartitions selon les continents, la seule observation qu'il est possible de faire est celle de pays Africains. Ceux-ci produisent très peu de déchet il y en a donc très peu qui sont mal gérés. Les autres continents sont répartis plutôt uniformément dans le graphe. 
 
 ### Exercise 5
 
 
 ```{r plastic-waste-population-total}
-# insert code here
+ggplot(plastic_waste, aes(total_pop, plastic_waste_per_cap))+
+  geom_point() +
+  labs(y = "Quantité de déchets plastiques par habitant",
+       x = "Population totale",
+       title = "Quantité de déchets plastiques par habitant en fonction de la population totale")
 ```
 
 ```{r plastic-waste-population-coastal}
-# insert code here
+ggplot(plastic_waste, aes(coastal_pop, plastic_waste_per_cap))+
+  geom_point()+
+  labs(y = "Quantité de déchets plastiques par habitant",
+       x = "Population côtière",
+       title = "Quantité de déchets plastiques par habitant en fonction de la population côtière")
 ```
 
-Réponse à la question...
+Même si les deux graphes sont très semblables, il semble que la relation entre la quantité de déchet par habitant et la population totale vivant sur une côte soit légèrement plus forte que celle entre la quantité de déchet par habitant et la population totale. Plus il y aurait d'habitant sur la côte et moins il y aurait de déchet de plastique par habitant. 
 
 ## Conclusion
 
 Recréez la visualisation:
 
 ```{r recreate-viz}
-# insert code here
+plastic_waste_coastal <- plastic_waste %>% 
+  mutate(coastal_pop_prop = coastal_pop / total_pop) %>%
+  filter(plastic_waste_per_cap < 3)
+
 ```
+
+```{r}
+ggplot(plastic_waste_coastal, aes(x = coastal_pop_prop, y = plastic_waste_per_cap, color = continent))+
+  geom_point()+
+  geom_smooth(method = "loess", se = TRUE, color = "black") +
+  labs(x = "Proportion de la population côtière (Coastal/total population)",
+       y = "Nombre de déchets plastiques par habitant",
+       color = "Continent",
+       title = "Quantité de déchets plastiques vs Proportion de la population côtière",
+       subtitle = "Selon le continent")
+  
+```
+On voit avec ce graphe qu'il y a une légère augmentation du nombre de déchets plastiques par habitant lorsque la proportion de la population côtière augmente. 
