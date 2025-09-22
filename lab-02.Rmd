@@ -1,7 +1,7 @@
 ---
 title: "Lab 02 - Plastic waste"
-author: "Votre nom"
-date: "La date"
+author: "Maxime Lord"
+date: "22 Septembre 2025"
 output: github_document
 ---
 
@@ -28,16 +28,22 @@ plastic_waste <- plastic_waste %>%
 ### Exercise 1
 
 ```{r plastic-waste-continent}
-# insert code here
+ggplot(plastic_waste, aes(plastic_waste_per_cap)) +
+  geom_histogram(binwidth = 0.05) +
+  facet_wrap(~continent, ncol = 3)
+  
 ```
+
+Avec l'aide de cette représentation on voit facilement que l'Afrique et l'Asie on moins de déchets de plastique par habitant que l'Europe et l'Amérique du Nord alors que l'Océanie et l'Amérique du Sud se situent à quelque part au milieu.
 
 ### Exercise 2
 
 ```{r plastic-waste-density}
-# insert code here
+ggplot(plastic_waste, aes(plastic_waste_per_cap,color = continent, fill = continent)) + 
+  geom_density(alpha = 0.3)
 ```
 
-Réponse à la question...
+La couleur, soit par la fonction ``color``, ou par la fonction ``fill``, est une variable. Celle-ci va varier en fonction du continent qu'elle représente. C'est pourquoi qu'elle doit se retrouver dans l'environnement ``aes``, là où on identifie les variables. Pour ce qui est du paramètre ``alpha``, il est le même pour toute les courbes et est propre à la courbe de densité. Dans un autre style de représentation, il aurait une signification complètement différente. C'est donc la raison de son identification dans l'environnement ``geom_density``.
 
 ### Exercise 3
 
